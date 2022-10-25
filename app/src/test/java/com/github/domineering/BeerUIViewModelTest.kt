@@ -4,12 +4,12 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-internal class StateExampleViewModelTest {
-    lateinit var stateExampleViewModel: StateExampleViewModel
+internal class BeerUIViewModelTest {
+    lateinit var stateExampleViewModel: BeerUIStateViewModel
 
     @Before
     fun setup() {
-        stateExampleViewModel = StateExampleViewModel()
+        stateExampleViewModel = BeerUIStateViewModel()
     }
 
     @Test

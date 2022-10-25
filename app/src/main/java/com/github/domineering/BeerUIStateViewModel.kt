@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class StateExampleViewModel @Inject constructor() : ViewModel() {
+class BeerUIStateViewModel @Inject constructor() : ViewModel() {
     private var _beerUIState = mutableStateOf(BeerUIState())
     val beerUIState = _beerUIState
 

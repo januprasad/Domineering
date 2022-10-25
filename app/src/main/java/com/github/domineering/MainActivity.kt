@@ -79,7 +79,7 @@ typealias DirectionState = MutableState<Direction>
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainApp() {
-    val uiViewModel = viewModel(modelClass = StateExampleViewModel::class.java)
+    val uiViewModel = viewModel(modelClass = BeerUIStateViewModel::class.java)
     val uiState by remember {
         uiViewModel.beerUIState
     }
