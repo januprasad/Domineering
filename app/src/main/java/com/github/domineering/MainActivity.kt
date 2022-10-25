@@ -37,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -84,8 +83,8 @@ fun MainApp() {
         uiViewModel.beerUIState
     }
 
-    val state: DirectionState = remember {
-        mutableStateOf(Direction.Up)
+    val directionState by remember {
+        uiViewModel.directionState
     }
 
     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.Center) {
@@ -96,7 +95,7 @@ fun MainApp() {
         Text(text = "How many beers you would like to have", fontSize = 17.sp)
         Spacer(modifier = Modifier.height(10.dp))
 
-        AnimatedBeerCounter(state, uiState.selectedBeer)
+        AnimatedBeerCounter(directionState, uiState.selectedBeer)
 
         Spacer(modifier = Modifier.height(10.dp))
         ButtonBar() { event ->
@@ -109,11 +108,11 @@ fun MainApp() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimatedBeerCounter(state: DirectionState, selectedBeer: Int) {
+fun AnimatedBeerCounter(state: Direction, selectedBeer: Int) {
     AnimatedContent(
         targetState = selectedBeer,
         transitionSpec = {
-            addAnimation(state.value).using(
+            addAnimation(state).using(
                 SizeTransform(clip = false)
             )
         }
