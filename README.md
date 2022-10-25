@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-Domineering is a an example project for handling states of an application and with your composables, also this way of writing handling states will you 100% testability.
+Domineering is a an example project for handling states of an application and with your composables. Event handling methods will give you 100% testability.
 
 ## Demo
 
