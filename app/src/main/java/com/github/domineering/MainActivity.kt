@@ -14,6 +14,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,24 +25,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,107 +79,122 @@ typealias DirectionState = MutableState<Direction>
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainApp() {
-
-    val uiViewModel = viewModel(modelClass = SharedFlowExampleViewModel::class.java)
-
-    val minValue = 0
-    val stockValue = remember {
-        mutableStateOf(15)
-    }
-    val counter = remember {
-        mutableStateOf(minValue)
+    val uiViewModel = viewModel(modelClass = StateExampleViewModel::class.java)
+    val uiState by remember {
+        uiViewModel.beerUIState
     }
 
     val state: DirectionState = remember {
         mutableStateOf(Direction.Up)
     }
-    LaunchedEffect(key1 = state.value) {
-        when (state.value) {
-            Direction.Down -> stockValue.value = stockValue.value - 1
-            Direction.Up -> stockValue.value = stockValue.value + 1
-        }
-    }
 
     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.Center) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = "Beer Bar", fontSize = 70.sp)
-            OutlinedCard(
-                modifier = Modifier.size(30.dp),
+            Text(text = "Beer Bar", fontSize = 70.sp, style = MaterialTheme.typography.bodyLarge)
+            BeerLeftCounter(uiState.beerLeft)
+        }
+        Text(text = "How many beers you would like to have", fontSize = 17.sp)
+        Spacer(modifier = Modifier.height(10.dp))
+
+        AnimatedBeerCounter(state, uiState.selectedBeer)
+
+        Spacer(modifier = Modifier.height(10.dp))
+        ButtonBar() { event ->
+            uiViewModel.onUIEvent(event)
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        BeerIcons(uiState.selectedBeer)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun AnimatedBeerCounter(state: DirectionState, selectedBeer: Int) {
+    AnimatedContent(
+        targetState = selectedBeer,
+        transitionSpec = {
+            addAnimation(state.value).using(
+                SizeTransform(clip = false)
+            )
+        }
+    ) { value ->
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "$value",
+            textAlign = TextAlign.Center,
+            fontSize = 50.sp
+        )
+    }
+}
+
+@Composable
+fun ButtonBar(event: (UIEvent.InputEvents) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Button(onClick = {
+            event(UIEvent.InputEvents.Up)
+        }) {
+            Text(text = "+         Add", color = Color.White)
+        }
+        Button(
+            onClick = {
+                event(UIEvent.InputEvents.Down)
+            }
+        ) {
+            Text(text = "-    Decrease", color = Color.White)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@Composable
+fun BeerIcons(beerCount: Int) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 10.dp,
+        crossAxisSpacing = 10.dp
+    ) {
+        repeat(beerCount) {
+            Card(
+                modifier = Modifier.size(60.dp),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
                 elevation = CardDefaults.cardElevation(10.dp)
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(60.dp)) {
-                    Text(text = stockValue.value.toString(), fontSize = 10.sp)
-                }
-            }
-        }
-        Text(text = "How many beers you would like to have", fontSize = 17.sp)
-        Spacer(modifier = Modifier.height(10.dp))
-        AnimatedContent(
-            targetState = counter.value,
-            transitionSpec = {
-                addAnimation(state.value).using(
-                    SizeTransform(clip = false)
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 6.dp),
+                    painter = painterResource(id = R.drawable.beer_bottle),
+                    contentDescription = "beer_bottle",
+                    colorFilter = ColorFilter.tint(Color.White)
                 )
             }
-        ) { value ->
-            Text(
-                text = "$value",
-                textAlign = TextAlign.Center,
-                fontSize = 50.sp
-            )
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button(onClick = {
-                when {
-                    stockValue.value != counter.value -> {
-                        counter.value = counter.value + 1
-                        state.value = Direction.Up
-                    }
-                }
-            }) {
-                Text(text = "+         Add")
-            }
-            Button(onClick = {
-                when {
-                    minValue != counter.value -> {
-                        counter.value = counter.value - 1
-                        state.value = Direction.Down
-                    }
-                }
-            }) {
-                Text(text = "-    Decrease")
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            mainAxisSpacing = 10.dp,
-            crossAxisSpacing = 10.dp
-        ) {
-            repeat(counter.value) {
-                Card(
-                    modifier = Modifier.size(60.dp),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    elevation = CardDefaults.cardElevation(10.dp)
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize().padding(top = 6.dp),
-                        painter = painterResource(id = R.drawable.beer_bottle),
-                        contentDescription = "beer_bottle",
-                        colorFilter = ColorFilter.tint(Color.White)
-                    )
-                }
-            }
-        }
+@Composable
+fun BeerLeftCounter(counter: Int) {
+    val stockValue = rememberUpdatedState(newValue = counter)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .width(60.dp)
+            .height(20.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.primary)
+    ) {
+        Text(
+            text = stockValue.value.toString(),
+            fontSize = 11.sp,
+            style = TextStyle(
+                lineHeight = 20.sp,
+                fontStyle = FontStyle.Italic
+            ),
+            color = Color.White
+        )
     }
 }
 

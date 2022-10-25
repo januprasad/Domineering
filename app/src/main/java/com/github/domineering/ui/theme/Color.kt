@@ -2,8 +2,8 @@ package com.github.domineering.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
+val Purple80 = Color(0xFF2F146D)
+val PurpleGrey80 = Color(0xFF220F41)
 val Pink80 = Color(0xFFEFB8C8)
 val Beer = Color(0xFFA76708)
 val Blue = Color(0xFF3700B3)

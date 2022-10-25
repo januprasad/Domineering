@@ -13,17 +13,25 @@ class StateExampleViewModel @Inject constructor() : ViewModel() {
     fun onUIEvent(event: UIEvent.InputEvents) {
         when (event) {
             UIEvent.InputEvents.Up -> {
-                _beerUIState.value = beerUIState.value.copy(
-                    beerLeft = beerUIState.value.beerLeft - 1,
-                    selectedBeer = beerUIState.value.selectedBeer + 1
-                )
+                when {
+                    _beerUIState.value.beerLeft != _beerUIState.value.selectedBeer -> {
+                        _beerUIState.value = beerUIState.value.copy(
+                            beerLeft = beerUIState.value.beerLeft - 1,
+                            selectedBeer = beerUIState.value.selectedBeer + 1
+                        )
+                    }
+                }
             }
 
             UIEvent.InputEvents.Down -> {
-                _beerUIState.value = beerUIState.value.copy(
-                    beerLeft = beerUIState.value.beerLeft + 1,
-                    selectedBeer = beerUIState.value.selectedBeer - 1
-                )
+                when {
+                    0 != _beerUIState.value.selectedBeer -> {
+                        _beerUIState.value = beerUIState.value.copy(
+                            beerLeft = beerUIState.value.beerLeft + 1,
+                            selectedBeer = beerUIState.value.selectedBeer - 1
+                        )
+                    }
+                }
             }
         }
     }
